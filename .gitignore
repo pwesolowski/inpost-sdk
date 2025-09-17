@@ -1,0 +1,29 @@
+# Gradle
+.gradle/
+build/
+**/build/
+!gradle/wrapper/gradle-wrapper.jar
+out/
+
+# IDEs
+.idea/
+*.iml
+*.ipr
+*.iws
+.project
+.classpath
+.settings/
+
+# OS
+.DS_Store
+
+# Logs
+*.log
+
+# Kotlin/Java
+hs_err_pid*
+
+# Publishing / Credentials (example placeholders; do not commit real secrets)
+local.properties
+secrets.properties
+
