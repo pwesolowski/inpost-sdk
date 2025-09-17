@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package pl.inpost.core
+package io.github.pwesolowski.inpost.core
 
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test

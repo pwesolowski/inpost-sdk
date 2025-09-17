@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package pl.inpost.core
+package io.github.pwesolowski.inpost.core
 
-import pl.inpost.core.config.InpostClientConfig
-import pl.inpost.core.models.CreateShipmentRequest
-import pl.inpost.core.models.Organization
-import pl.inpost.core.models.Shipment
+import io.github.pwesolowski.inpost.core.config.InpostClientConfig
+import io.github.pwesolowski.inpost.core.models.CreateShipmentRequest
+import io.github.pwesolowski.inpost.core.models.Organization
+import io.github.pwesolowski.inpost.core.models.Shipment
 
 /**
  * Entry point for interacting with InPost APIs (synchronous).

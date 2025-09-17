@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package pl.inpost.core.auth
+package io.github.pwesolowski.inpost.core.auth
 
 /**
  * Supported authentication mechanisms for InPost APIs.

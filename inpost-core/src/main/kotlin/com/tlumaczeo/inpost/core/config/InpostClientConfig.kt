@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package pl.inpost.core.config
+package io.github.pwesolowski.inpost.core.config
 
-import pl.inpost.core.auth.AuthCredentials
+import io.github.pwesolowski.inpost.core.auth.AuthCredentials
 
 /**
  * Configuration for the InPost client.

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package pl.inpost.core.models
+package io.github.pwesolowski.inpost.core.models
 
 /**
  * Placeholder model mapped from Postman collection schema (to be refined).

@@ -14,21 +14,21 @@
  * limitations under the License.
  */
 
-package pl.inpost.core.internal
+package io.github.pwesolowski.inpost.core.internal
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
+import io.github.pwesolowski.inpost.core.InpostClient
+import io.github.pwesolowski.inpost.core.config.InpostClientConfig
+import io.github.pwesolowski.inpost.core.models.CreateShipmentRequest
+import io.github.pwesolowski.inpost.core.models.Organization
+import io.github.pwesolowski.inpost.core.models.Shipment
 import okhttp3.HttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
-import pl.inpost.core.InpostClient
-import pl.inpost.core.config.InpostClientConfig
-import pl.inpost.core.models.CreateShipmentRequest
-import pl.inpost.core.models.Organization
-import pl.inpost.core.models.Shipment
 
 internal class DefaultInpostClient(
     override val config: InpostClientConfig,

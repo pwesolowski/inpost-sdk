@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package pl.inpost.spring
+package io.github.pwesolowski.inpost.spring
 
+import io.github.pwesolowski.inpost.core.InpostClient
+import io.github.pwesolowski.inpost.core.auth.AuthCredentials
 import org.springframework.boot.autoconfigure.AutoConfiguration
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
-import pl.inpost.core.InpostClient
-import pl.inpost.core.auth.AuthCredentials
 
 @AutoConfiguration
 @EnableConfigurationProperties(InpostProperties::class)

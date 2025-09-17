@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package pl.inpost.core
+package io.github.pwesolowski.inpost.core
 
+import io.github.pwesolowski.inpost.core.auth.AuthCredentials
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-import pl.inpost.core.auth.AuthCredentials
 
 class InpostClientBuilderTest {
     @Test

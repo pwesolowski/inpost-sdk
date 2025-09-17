@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package pl.inpost.contract
+package io.github.pwesolowski.inpost.contract
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue

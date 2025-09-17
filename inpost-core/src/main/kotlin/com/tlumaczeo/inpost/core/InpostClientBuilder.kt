@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-package pl.inpost.core
+package io.github.pwesolowski.inpost.core
 
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import io.github.pwesolowski.inpost.core.auth.AuthCredentials
+import io.github.pwesolowski.inpost.core.config.InpostClientConfig
+import io.github.pwesolowski.inpost.core.internal.DefaultInpostClient
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import pl.inpost.core.auth.AuthCredentials
-import pl.inpost.core.config.InpostClientConfig
-import pl.inpost.core.internal.DefaultInpostClient
 import java.time.Duration
 
 class InpostClientBuilder internal constructor() {
@@ -105,12 +105,12 @@ private class AuthInterceptor(
         val original = chain.request()
         val builder = original.newBuilder()
         when (credentials) {
-            is pl.inpost.core.auth.AuthCredentials.ApiKey ->
+            is io.github.pwesolowski.inpost.core.auth.AuthCredentials.ApiKey ->
                 builder.header(
                     "Authorization",
                     "Bearer ${credentials.key}",
                 )
-            is pl.inpost.core.auth.AuthCredentials.OAuth2ClientCredentials -> {
+            is io.github.pwesolowski.inpost.core.auth.AuthCredentials.OAuth2ClientCredentials -> {
                 throw UnsupportedOperationException("OAuth2 client credentials flow not implemented yet")
             }
         }
