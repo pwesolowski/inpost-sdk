@@ -14,20 +14,19 @@
  * limitations under the License.
  */
 
-package com.tlumaczeo.inpost.core
+package pl.inpost.core
 
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import com.tlumaczeo.inpost.core.auth.AuthCredentials
-import com.tlumaczeo.inpost.core.config.InpostClientConfig
-import com.tlumaczeo.inpost.core.internal.DefaultInpostClient
-import io.ktor.client.HttpClient
-import io.ktor.client.engine.cio.CIO
-import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.client.plugins.defaultRequest
-import io.ktor.serialization.jackson.JacksonConverter
+import okhttp3.Interceptor
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import pl.inpost.core.auth.AuthCredentials
+import pl.inpost.core.config.InpostClientConfig
+import pl.inpost.core.internal.DefaultInpostClient
+import java.time.Duration
 
 class InpostClientBuilder internal constructor() {
     private var baseUrl: String = "https://api.inpost.pl"
@@ -35,7 +34,7 @@ class InpostClientBuilder internal constructor() {
     private var connectTimeoutMs: Long = 10_000
     private var readTimeoutMs: Long = 30_000
     private var userAgent: String = "inpost-jvm-sdk"
-    private var httpClient: HttpClient? = null
+    private var httpClient: OkHttpClient? = null
     private var objectMapper: ObjectMapper = defaultObjectMapper()
 
     fun baseUrl(baseUrl: String) = apply { this.baseUrl = baseUrl }
@@ -48,7 +47,7 @@ class InpostClientBuilder internal constructor() {
 
     fun userAgent(agent: String) = apply { this.userAgent = agent }
 
-    fun httpClient(client: HttpClient) = apply { this.httpClient = client }
+    fun httpClient(client: OkHttpClient) = apply { this.httpClient = client }
 
     fun objectMapper(mapper: ObjectMapper) = apply { this.objectMapper = mapper }
 
@@ -62,29 +61,59 @@ class InpostClientBuilder internal constructor() {
                 readTimeoutMs = readTimeoutMs,
                 userAgent = userAgent,
             )
-        val client = httpClient ?: createDefaultHttpClient(cfg, objectMapper)
+        val client = httpClient ?: createDefaultHttpClient(cfg, creds)
         return DefaultInpostClient(cfg, client, objectMapper)
     }
 
     private fun createDefaultHttpClient(
         config: InpostClientConfig,
-        mapper: ObjectMapper,
-    ): HttpClient =
-        HttpClient(CIO) {
-            engine {
-                requestTimeout = config.readTimeoutMs
-            }
-            install(ContentNegotiation) {
-                register(io.ktor.http.ContentType.Application.Json, JacksonConverter(mapper))
-            }
-            defaultRequest {
-                headers.append("User-Agent", config.userAgent)
-            }
-        }
+        creds: AuthCredentials,
+    ): OkHttpClient =
+        OkHttpClient
+            .Builder()
+            .connectTimeout(Duration.ofMillis(config.connectTimeoutMs))
+            .readTimeout(Duration.ofMillis(config.readTimeoutMs))
+            .addInterceptor(UserAgentInterceptor(config.userAgent))
+            .addInterceptor(AuthInterceptor(creds))
+            .build()
 
     private fun defaultObjectMapper(): ObjectMapper =
         jacksonObjectMapper()
             .findAndRegisterModules()
             .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
             .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+}
+
+private class UserAgentInterceptor(
+    private val userAgent: String,
+) : Interceptor {
+    override fun intercept(chain: Interceptor.Chain): okhttp3.Response {
+        val original: Request = chain.request()
+        val request =
+            original
+                .newBuilder()
+                .header("User-Agent", userAgent)
+                .build()
+        return chain.proceed(request)
+    }
+}
+
+private class AuthInterceptor(
+    private val credentials: AuthCredentials,
+) : Interceptor {
+    override fun intercept(chain: Interceptor.Chain): okhttp3.Response {
+        val original = chain.request()
+        val builder = original.newBuilder()
+        when (credentials) {
+            is pl.inpost.core.auth.AuthCredentials.ApiKey ->
+                builder.header(
+                    "Authorization",
+                    "Bearer ${credentials.key}",
+                )
+            is pl.inpost.core.auth.AuthCredentials.OAuth2ClientCredentials -> {
+                throw UnsupportedOperationException("OAuth2 client credentials flow not implemented yet")
+            }
+        }
+        return chain.proceed(builder.build())
+    }
 }

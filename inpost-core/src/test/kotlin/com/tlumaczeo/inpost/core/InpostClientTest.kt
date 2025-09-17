@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.tlumaczeo.inpost.core
+package pl.inpost.core
 
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test

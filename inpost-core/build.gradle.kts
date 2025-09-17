@@ -6,15 +6,13 @@ plugins {
 
 dependencies {
     api(libs.slf4j.api)
-    api(libs.coroutines.core)
 
-    implementation(libs.ktor.client.core)
-    implementation(libs.ktor.client.cio)
-    implementation(libs.ktor.client.content.negotiation)
-    implementation(libs.ktor.serialization.jackson)
+    implementation(platform(libs.jackson.bom))
+    implementation(libs.jackson.databind)
+    implementation(libs.jackson.module.kotlin)
 
-    implementation("com.fasterxml.jackson.core:jackson-databind")
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
+    implementation(libs.okhttp)
+    implementation(libs.okhttp.logging)
 }
 
 kotlin {

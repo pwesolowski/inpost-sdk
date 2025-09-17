@@ -12,7 +12,7 @@ Modularne SDK do integracji z API InPost, zaprojektowane dla JVM z naciskiem na 
 - Kotlin (JVM), domyślna toolchain: Java 17 (konfigurowalna przez `gradle.properties`).
 
 ## Instalacja (Maven/Gradle)
-Publikacja do Maven Central: w toku. Artefakty będą dostępne jako `com.tlumaczeo.inpost:*`.
+Publikacja do Maven Central: w toku. Artefakty będą dostępne jako `pl.inpost:*`.
 
 ## Szybki start
 ```kotlin

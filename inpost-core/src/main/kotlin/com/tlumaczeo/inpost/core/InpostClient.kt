@@ -14,26 +14,32 @@
  * limitations under the License.
  */
 
-package com.tlumaczeo.inpost.core
+package pl.inpost.core
 
-import com.tlumaczeo.inpost.core.config.InpostClientConfig
-import com.tlumaczeo.inpost.core.models.TrackingResponse
-import kotlinx.coroutines.Deferred
+import pl.inpost.core.config.InpostClientConfig
+import pl.inpost.core.models.CreateShipmentRequest
+import pl.inpost.core.models.Organization
+import pl.inpost.core.models.Shipment
 
 /**
- * Entry point for interacting with InPost APIs.
- * Inspired by AWS SDK v2 style and Kotlin coroutines.
+ * Entry point for interacting with InPost APIs (synchronous).
+ * Inspired by AWS SDK v2 style.
  */
 interface InpostClient : AutoCloseable {
     val config: InpostClientConfig
 
-    /**
-     * Example endpoint: track a shipment by tracking number.
-     * Suspends or returns a Deferred for flexible async usage.
-     */
-    suspend fun trackShipment(trackingNumber: String): TrackingResponse
+    fun getOrganization(organizationId: String): Organization
 
-    fun trackShipmentAsync(trackingNumber: String): Deferred<TrackingResponse>
+    fun listShipments(
+        organizationId: String,
+        page: Int? = null,
+        perPage: Int? = null,
+    ): List<Shipment>
+
+    fun createShipment(
+        organizationId: String,
+        request: CreateShipmentRequest,
+    ): Shipment
 
     override fun close() {}
 

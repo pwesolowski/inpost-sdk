@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.tlumaczeo.inpost.core.auth
+package pl.inpost.core.auth
 
 /**
  * Supported authentication mechanisms for InPost APIs.

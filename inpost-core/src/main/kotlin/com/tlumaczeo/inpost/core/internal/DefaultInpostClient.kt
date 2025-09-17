@@ -14,31 +14,86 @@
  * limitations under the License.
  */
 
-package com.tlumaczeo.inpost.core.internal
+package pl.inpost.core.internal
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.tlumaczeo.inpost.core.InpostClient
-import com.tlumaczeo.inpost.core.config.InpostClientConfig
-import com.tlumaczeo.inpost.core.models.TrackingResponse
-import io.ktor.client.HttpClient
-import kotlinx.coroutines.CompletableDeferred
-import kotlinx.coroutines.Deferred
+import com.fasterxml.jackson.module.kotlin.readValue
+import okhttp3.HttpUrl
+import okhttp3.HttpUrl.Companion.toHttpUrl
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.RequestBody.Companion.toRequestBody
+import pl.inpost.core.InpostClient
+import pl.inpost.core.config.InpostClientConfig
+import pl.inpost.core.models.CreateShipmentRequest
+import pl.inpost.core.models.Organization
+import pl.inpost.core.models.Shipment
 
 internal class DefaultInpostClient(
     override val config: InpostClientConfig,
-    private val http: HttpClient,
+    private val http: OkHttpClient,
     private val mapper: ObjectMapper,
 ) : InpostClient {
-    override suspend fun trackShipment(trackingNumber: String): TrackingResponse {
-        error("Not implemented")
+    override fun getOrganization(organizationId: String): Organization {
+        val url = baseUrlBuilder().addPathSegments("v1/organizations/$organizationId").build()
+        val request =
+            Request
+                .Builder()
+                .url(url)
+                .get()
+                .build()
+        http.newCall(request).execute().use { resp ->
+            if (!resp.isSuccessful) error("HTTP ${resp.code}: ${resp.body?.string()}")
+            val body = resp.body?.string().orEmpty()
+            return mapper.readValue(body)
+        }
     }
 
-    override fun trackShipmentAsync(trackingNumber: String): Deferred<TrackingResponse> =
-        CompletableDeferred<TrackingResponse>().also {
-            it.completeExceptionally(UnsupportedOperationException("Not implemented"))
+    override fun listShipments(
+        organizationId: String,
+        page: Int?,
+        perPage: Int?,
+    ): List<Shipment> {
+        val httpBuilder = baseUrlBuilder().addPathSegments("v1/organizations/$organizationId/shipments")
+        if (page != null) httpBuilder.addQueryParameter("page", page.toString())
+        if (perPage != null) httpBuilder.addQueryParameter("per_page", perPage.toString())
+        val request =
+            Request
+                .Builder()
+                .url(httpBuilder.build())
+                .get()
+                .build()
+        http.newCall(request).execute().use { resp ->
+            if (!resp.isSuccessful) error("HTTP ${resp.code}: ${resp.body?.string()}")
+            val body = resp.body?.string().orEmpty()
+            return mapper.readValue(body)
         }
+    }
+
+    override fun createShipment(
+        organizationId: String,
+        request: CreateShipmentRequest,
+    ): Shipment {
+        val url = baseUrlBuilder().addPathSegments("v1/organizations/$organizationId/shipments").build()
+        val json = mapper.writeValueAsString(request)
+        val mediaType = "application/json".toMediaType()
+        val req =
+            Request
+                .Builder()
+                .url(url)
+                .post(json.toRequestBody(mediaType))
+                .build()
+        http.newCall(req).execute().use { resp ->
+            if (resp.code !in 200..299) error("HTTP ${resp.code}: ${resp.body?.string()}")
+            val body = resp.body?.string().orEmpty()
+            return mapper.readValue(body)
+        }
+    }
+
+    private fun baseUrlBuilder(): HttpUrl.Builder = config.baseUrl.toHttpUrl().newBuilder()
 
     override fun close() {
-        http.close()
+        // OkHttp cleans up automatically; no-op
     }
 }

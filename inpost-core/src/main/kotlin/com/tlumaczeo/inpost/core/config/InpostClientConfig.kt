@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package com.tlumaczeo.inpost.core.config
+package pl.inpost.core.config
 
-import com.tlumaczeo.inpost.core.auth.AuthCredentials
+import pl.inpost.core.auth.AuthCredentials
 
 /**
  * Configuration for the InPost client.

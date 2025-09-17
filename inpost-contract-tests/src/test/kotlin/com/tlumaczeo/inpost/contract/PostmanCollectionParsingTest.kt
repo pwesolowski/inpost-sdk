@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.tlumaczeo.inpost.contract
+package pl.inpost.contract
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.tlumaczeo.inpost.core.models
+package pl.inpost.core.models
 
 /**
  * Placeholder model mapped from Postman collection schema (to be refined).

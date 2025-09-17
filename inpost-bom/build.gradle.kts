@@ -11,8 +11,7 @@ dependencies {
     constraints {
         api(project(":inpost-core"))
         api(project(":inpost-spring-starter"))
-        api("io.ktor:ktor-client-core:${libs.versions.ktor.get()}")
-        api("org.jetbrains.kotlinx:kotlinx-coroutines-core:${libs.versions.coroutines.get()}")
+        api("com.squareup.okhttp3:okhttp:${libs.versions.okhttp.get()}")
         api("org.slf4j:slf4j-api:${libs.versions.slf4j.get()}")
     }
 }
