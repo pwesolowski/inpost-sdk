@@ -1,0 +1,62 @@
+name: Publish SNAPSHOT to Sonatype
+
+on:
+  push:
+    branches: [ "main" ]
+
+concurrency:
+  group: publish-snapshot-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: 'gradle'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Determine version
+        id: vars
+        shell: bash
+        run: |
+          VERSION=$(grep '^version=' gradle.properties | cut -d'=' -f2)
+          echo "Detected version: $VERSION"
+          if [[ "$VERSION" == *-SNAPSHOT ]]; then
+            echo "is_snapshot=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "is_snapshot=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Configure credentials for Gradle
+        if: steps.vars.outputs.is_snapshot == 'true'
+        shell: bash
+        run: |
+          mkdir -p ~/.gradle
+          cat >> ~/.gradle/gradle.properties <<'EOF'
+          sonatypeUsername=${{ secrets.SONATYPE_USERNAME }}
+          sonatypePassword=${{ secrets.SONATYPE_PASSWORD }}
+          signing.key=${{ secrets.SIGNING_KEY }}
+          signing.password=${{ secrets.SIGNING_PASSWORD }}
+          EOF
+
+      - name: Build and publish SNAPSHOT
+        if: steps.vars.outputs.is_snapshot == 'true'
+        shell: bash
+        run: |
+          ./gradlew --no-daemon --stacktrace clean build publishToSonatype
+
+      - name: Skip (not a SNAPSHOT version)
+        if: steps.vars.outputs.is_snapshot != 'true'
+        run: echo "Version is not a SNAPSHOT, skipping snapshot publication."
